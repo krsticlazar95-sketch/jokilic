@@ -78,7 +78,12 @@
     }
     .card > *{ position:relative; z-index:1; }
 
-    @keyframes glowSpin{ to{ transform: rotate(360deg) } }
+    .title h1{
+      background: linear-gradient(90deg, #fff, var(--gold), #fff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
 
     .title{
       display:flex;
@@ -91,10 +96,6 @@
       font-size:clamp(20px, 4vw, 28px);
       margin:0;
       letter-spacing:.2px;
-      background: linear-gradient(90deg, #fff, var(--gold), #fff);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
     }
 
     .sub{
@@ -271,7 +272,7 @@
       flex-wrap:wrap;
       gap:10px;
       align-items:center;
-      justify-content:flex-end;
+      justify-content:space-between;
     }
 
     .btn{
@@ -288,6 +289,22 @@
     }
     .btn:hover{ background: rgba(255,255,255,.14) }
     .btn:active{ transform: translateY(1px) }
+
+    .file{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    input[type="file"]{
+      width:min(360px, 86vw);
+      padding:10px;
+      border-radius:14px;
+      border: 1px dashed rgba(255,255,255,.25);
+      background: rgba(0,0,0,.18);
+      color:rgba(255,255,255,.85);
+    }
 
     /* Modal */
     .modal{
@@ -309,11 +326,7 @@
       border-radius:26px;
       box-shadow: 0 30px 100px rgba(0,0,0,.55);
       overflow:hidden;
-      transform: translateY(10px) scale(.98);
-      opacity:0;
-      transition: transform .25s ease, opacity .25s ease;
     }
-    .modal.open .modalCard{ transform: translateY(0) scale(1); opacity:1; }
 
     .modalHead{
       display:flex;
@@ -323,12 +336,14 @@
       padding:14px 16px;
       border-bottom:1px solid rgba(255,255,255,.10);
     }
+
     .modalHead .left{
       display:flex;
       align-items:center;
       gap:10px;
       min-width:0;
     }
+
     .badge{
       padding:6px 10px;
       border-radius:999px;
@@ -337,6 +352,7 @@
       font-size:12px;
       white-space:nowrap;
     }
+
     .modalTitle{
       font-weight:800;
       letter-spacing:.2px;
@@ -344,12 +360,15 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    .modalBody{ padding:16px; }
+
+    .modalBody{
+      padding:16px;
+    }
 
     .viewer{
       width:100%;
       height:min(60vh, 520px);
-      border-radius:22px;
+      border-radius:20px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
       display:flex;
@@ -358,20 +377,9 @@
       overflow:hidden;
       position:relative;
     }
-    .viewer::after{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius:24px;
-      background: conic-gradient(from 180deg, rgba(255,77,141,.0), rgba(255,77,141,.35), rgba(167,139,250,.30), rgba(255,77,141,.0));
-      filter: blur(14px);
-      opacity:.35;
-      animation: glowSpin2 5.5s linear infinite;
-      pointer-events:none;
-    }
-    @keyframes glowSpin2{ to{ transform: rotate(360deg) } }
 
-    .viewer img{
+    .viewer img,
+    .viewer #img{
       width:auto !important;
       height:auto !important;
       max-width:100% !important;
@@ -380,7 +388,6 @@
       object-position:center !important;
       display:block;
       background: rgba(0,0,0,.12);
-      will-change: transform, opacity;
     }
 
     .nav{
@@ -390,12 +397,14 @@
       margin-top:12px;
       flex-wrap:wrap;
     }
+
     .small{
       opacity:.85;
       font-size:13px;
       margin:10px 0 0 0;
       line-height:1.35;
     }
+
     .x{
       width:40px;
       height:40px;
@@ -406,6 +415,7 @@
       border: 1px solid rgba(255,255,255,.14);
       cursor:pointer;
     }
+
     .toast{
       position:absolute;
       top:14px;
@@ -423,6 +433,7 @@
     .toast.show{ opacity:1; transform: translateY(0) }
 
     .sr-only{ position:absolute; left:-9999px; }
+  
 
     /* floating background hearts */
     .bgHearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
@@ -438,7 +449,31 @@
       100%{ transform: translateY(-20vh) translateX(40px) rotate(18deg); opacity:0 }
     }
 
+    /* modal entrance */
+    .modalCard{
+      transform: translateY(10px) scale(.98);
+      opacity:0;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .modal.open .modalCard{ transform: translateY(0) scale(1); opacity:1; }
+
+    /* cute animated frame glow */
+    .viewer{ border-radius:22px; }
+    .viewer::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:24px;
+      background: conic-gradient(from 180deg, rgba(255,77,141,.0), rgba(255,77,141,.35), rgba(167,139,250,.30), rgba(255,77,141,.0));
+      filter: blur(14px);
+      opacity:.35;
+      animation: glowSpin 5.5s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes glowSpin{ to{ transform: rotate(360deg) } }
+
     /* slide animations */
+    .imgAnim{ will-change: transform, opacity; }
     .inRight{ animation: inRight .38s ease both; }
     .inLeft{ animation: inLeft .38s ease both; }
     @keyframes inRight{ from{ opacity:0; transform: translateX(26px) scale(.985) } to{ opacity:1; transform: translateX(0) scale(1) } }
@@ -461,24 +496,11 @@
       100%{ opacity:0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.2) rotate(var(--r)) }
     }
 
-    /* ring + float */
-    .ring{
-      position:absolute;
-      width:180px; height:180px;
-      border-radius:50%;
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: inset 0 0 0 1px rgba(255,77,141,.18);
-      opacity:0;
-      animation: ring 1.4s ease-out infinite;
-      pointer-events:none;
-    }
-
   </style>
 </head>
 <body>
   <div class="twinkles" aria-hidden="true" id="twinkles"></div>
   <div class="bgHearts" aria-hidden="true" id="bgHearts"></div>
-
   <div class="wrap">
     <div class="card">
       <div class="sparkle"></div>
@@ -514,7 +536,7 @@
       </div>
 
       <div class="stage" aria-label="Balloon stage">
-        <div class="toast" id="toast">Loading your photos… 💞</div>
+        <div class="toast" id="toast">Loading photos… 💞</div>
         <div class="ring" aria-hidden="true"></div>
 
         <!-- Balloon SVG -->
@@ -535,12 +557,14 @@
       </div>
 
       <div class="controls">
-        <button class="btn" id="testSong">Test song</button>
-        <button class="btn" id="stopSong">Stop song</button>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end; width:100%">
+          <button class="btn" id="testSong">Test song</button>
+          <button class="btn" id="stopSong">Stop song</button>
+        </div>
       </div>
 
       <p class="small">
-        Song: upload an MP3 named <b>love-song.mp3</b> next to this HTML file (same folder).
+        Song: put an MP3 file named <b>love-song.mp3</b> next to this HTML file.
         Photos: upload images into a folder named <b>photos</b> and name them <b>1.jpg, 2.jpg, 3.jpg…</b> (or .png/.webp).
       </p>
     </div>
@@ -560,7 +584,7 @@
       <div class="modalBody">
         <div class="viewer">
           <div class="heartBurst" id="heartBurst" aria-hidden="true"></div>
-          <img id="img" alt="" />
+          <img id="img" class="imgAnim" alt="" />
         </div>
 
         <div class="nav">
@@ -578,7 +602,7 @@
   </audio>
 
   <script>
-    const balloon = document.getElementById('balloon');
+        const balloon = document.getElementById('balloon');
     const modal = document.getElementById('modal');
     const img = document.getElementById('img');
     const counter = document.getElementById('counter');
@@ -591,7 +615,7 @@
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const closeBtn = document.getElementById('close');
-
+    
     const heartBurst = document.getElementById('heartBurst');
     let lastDir = 1; // 1 = next/right, -1 = prev/left
 
@@ -622,7 +646,7 @@
         if(!images.length){
           img.removeAttribute('src');
           counter.textContent = '0 / 0';
-          showToast('Could not display those images. Try JPG/PNG.');
+          showToast('Could not display those images. Try a different JPG/PNG.');
           return;
         }
         idx = idx % images.length;
@@ -630,6 +654,7 @@
         setImage();
       };
 
+      // Force fit behavior (some embedded previews inject their own styles)
       img.style.width = 'auto';
       img.style.height = 'auto';
       img.style.maxWidth = '100%';
@@ -637,6 +662,7 @@
       img.style.objectFit = 'contain';
       img.style.objectPosition = 'center';
 
+      // Fun slide animation
       img.classList.remove('inLeft','inRight');
       void img.offsetWidth;
       img.classList.add(lastDir === 1 ? 'inRight' : 'inLeft');
@@ -661,17 +687,48 @@
       }
     }
 
+    function openModal(){
+      if(!photosReady){
+        preloadPhotos().then(() => {
+          if(images.length) openModal();
+        });
+        return;
+      }
+      if(!images.length){
+        showToast('No photos found in /photos 💔');
+        return;
+      }
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      burstHearts();
+      setImage();
+
+      audio.play().catch(() => {
+        showToast('Song blocked — click “Test song”');
+      });
+    }
+
     function closeModal(){
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden','true');
     }
+
+    function cleanupImages(){
+      images = [];
+      idx = 0;
+      photosReady = false;
+      setImage();
+    }
+
+    const BASE_HREF = (location.href.endsWith('/') ? location.href : (location.href + '/'));
 
     async function urlExists(url){
       return new Promise((resolve) => {
         const probe = new Image();
         probe.onload = () => resolve(true);
         probe.onerror = () => resolve(false);
-        probe.src = url + `?v=${Date.now()}`;
+        // cache-bust so GitHub Pages updates show up immediately
+        probe.src = url + (url.includes('?') ? '&' : '?') + `v=${Date.now()}`;
       });
     }
 
@@ -686,9 +743,8 @@
 
       for(let i=1;i<=maxIndex;i++){
         let gotOne = false;
-
         for(const ext of exts){
-          const url = `photos/${i}.${ext}`;
+          const url = new URL(`photos/${i}.${ext}`, BASE_HREF).href;
           // eslint-disable-next-line no-await-in-loop
           const ok = await urlExists(url);
           if(ok){
@@ -697,13 +753,11 @@
             break;
           }
         }
-
         if(!gotOne){
           missesInARow++;
         } else {
           missesInARow = 0;
         }
-
         if(missesInARow >= 6 && found.length >= 3) break;
       }
 
@@ -711,7 +765,7 @@
       photosReady = true;
 
       if(!images.length){
-        showToast('No photos found in /photos (use 1.jpg, 2.jpg, 3.jpg…)');
+        showToast('No photos found: use /photos/1.jpg, /2.jpg …');
       } else {
         idx = 0;
         setImage();
@@ -719,27 +773,11 @@
       }
     }
 
-    function openModal(){
-      if(!photosReady){
-        preloadPhotos().then(() => {
-          if(images.length) openModal();
-        });
-        return;
-      }
-      if(!images.length){
-        showToast('No photos found in /photos 💔');
-        return;
-      }
+    // Preload photos on page load
+    window.addEventListener('load', () => {
+      preloadPhotos();
+    });
 
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden','false');
-      burstHearts();
-      setImage();
-
-      audio.play().catch(() => showToast('Song blocked — click “Test song”'));
-    }
-
-    // UI actions
     balloon.addEventListener('click', openModal);
     balloon.addEventListener('keydown', (e) => {
       if(e.key === 'Enter' || e.key === ' ') openModal();
@@ -751,8 +789,10 @@
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 
+    
+
     testSong.addEventListener('click', () => {
-      audio.play().then(() => showToast('Playing 🎵')).catch(() => showToast('Could not play — check love-song.mp3'));
+      audio.play().then(() => showToast('Playing 🎵')).catch(() => showToast('Could not play — check the MP3 file'));
     });
 
     stopSong.addEventListener('click', () => {
@@ -768,7 +808,7 @@
       if(e.key === 'ArrowRight') { lastDir = 1; idx++; setImage(); burstHearts(); }
     });
 
-    // Floating hearts background
+    // Floating hearts in the background
     (function makeBgHearts(){
       const host = document.getElementById('bgHearts');
       if(!host) return;
@@ -834,11 +874,8 @@
       tick();
     })();
 
-    // Preload on page load
-    window.addEventListener('load', () => {
-      preloadPhotos();
-      setTimeout(() => showToast('Click the balloon 💞'), 700);
-    });
+    // Friendly startup hint
+    setTimeout(() => showToast('Click the balloon 💞'), 600);
   </script>
 </body>
 </html>
