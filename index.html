@@ -721,6 +721,8 @@
     }
 
     const BASE_HREF = (location.href.endsWith('/') ? location.href : (location.href + '/'));
+    // Fallback source: raw.githubusercontent.com (works even if Pages hasn’t picked up new assets yet)
+    const RAW_BASE = `https://raw.githubusercontent.com/krsticlazar95-sketch/jokilic/main/`;
 
     async function urlExists(url){
       return new Promise((resolve) => {
@@ -744,11 +746,22 @@
       for(let i=1;i<=maxIndex;i++){
         let gotOne = false;
         for(const ext of exts){
-          const url = new URL(`photos/${i}.${ext}`, BASE_HREF).href;
+          // Try GitHub Pages URL first
+          const pagesUrl = new URL(`photos/${i}.${ext}`, BASE_HREF).href;
+          // Fallback: raw GitHub (always matches repo contents)
+          const rawUrl = `${RAW_BASE}photos/${i}.${ext}`;
+
           // eslint-disable-next-line no-await-in-loop
-          const ok = await urlExists(url);
-          if(ok){
-            found.push(url);
+          const okPages = await urlExists(pagesUrl);
+          if(okPages){
+            found.push(pagesUrl);
+            gotOne = true;
+            break;
+          }
+          // eslint-disable-next-line no-await-in-loop
+          const okRaw = await urlExists(rawUrl);
+          if(okRaw){
+            found.push(rawUrl);
             gotOne = true;
             break;
           }
@@ -765,7 +778,7 @@
       photosReady = true;
 
       if(!images.length){
-        showToast('No photos found: use /photos/1.jpg, /2.jpg …');
+        showToast('No photos found. Ensure photos/1.jpg, 2.jpg… are committed (or wait for Pages deploy).');
       } else {
         idx = 0;
         setImage();
