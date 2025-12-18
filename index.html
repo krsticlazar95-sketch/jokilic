@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💖 Balloon Surprise</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#1b2a5a;
+      --pink:#ff4d8d;
+      --pink2:#ff7ab6;
+      --lav:#a78bfa;
+      --gold:#ffd1e8;
+      --white:#ffffff;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1100px 780px at 24% 18%, rgba(255,77,141,.26), transparent 60%),
+        radial-gradient(1000px 760px at 80% 70%, rgba(167,139,250,.22), transparent 62%),
+        radial-gradient(900px 680px at 55% 38%, rgba(255,209,232,.12), transparent 62%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      color:var(--white);
+      overflow:hidden;
+    }
+
+    /* subtle twinkles */
+    .twinkles{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .twinkles i{
+      position:absolute;
+      width:3px; height:3px;
+      border-radius:999px;
+      background: rgba(255,255,255,.55);
+      opacity:.0;
+      animation: twinkle 2.8s ease-in-out infinite;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.35));
+    }
+    @keyframes twinkle{
+      0%,100%{ opacity:0; transform: scale(.7) }
+      50%{ opacity:.55; transform: scale(1.25) }
+    }
+
+    .wrap{
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      position:relative;
+      z-index:1;
+    }
+
+    .card{
+      width:min(720px, 92vw);
+      padding:24px;
+      border-radius:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 24px 90px rgba(0,0,0,.45);
+      backdrop-filter: blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* glowing border */
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:30px;
+      background: conic-gradient(from 180deg, rgba(255,77,141,.0), rgba(255,77,141,.42), rgba(167,139,250,.36), rgba(255,209,232,.22), rgba(255,77,141,.0));
+      filter: blur(16px);
+      opacity:.35;
+      pointer-events:none;
+      animation: glowSpin 7.5s linear infinite;
+    }
+    .card > *{ position:relative; z-index:1; }
+
+    @keyframes glowSpin{ to{ transform: rotate(360deg) } }
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .title h1{
+      font-size:clamp(20px, 4vw, 28px);
+      margin:0;
+      letter-spacing:.2px;
+      background: linear-gradient(90deg, #fff, var(--gold), #fff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .sub{
+      margin:0 0 18px 0;
+      opacity:.9;
+      line-height:1.35;
+    }
+
+    .stage{
+      height:320px;
+      border-radius:22px;
+      background:
+        radial-gradient(700px 380px at 50% 30%, rgba(255,77,141,.12), transparent 60%),
+        rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* cute glow behind balloon */
+    .stage::before{
+      content:"";
+      position:absolute;
+      width:520px;
+      height:520px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(255,77,141,.18), rgba(167,139,250,.10), transparent 60%);
+      filter: blur(10px);
+      opacity:.55;
+      animation: breathe 4.2s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes breathe{ 0%,100%{ transform: scale(.96) } 50%{ transform: scale(1.04) } }
+
+    .hint{
+      position:absolute;
+      left:16px;
+      bottom:14px;
+      font-size:13px;
+      opacity:.8;
+      background: rgba(0,0,0,.25);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    /* Balloon */
+    .balloon{
+      width:120px;
+      height:160px;
+      cursor:pointer;
+      user-select:none;
+      filter: drop-shadow(0 14px 24px rgba(0,0,0,.35));
+      animation: float 3.2s ease-in-out infinite;
+      transform-origin: 50% 80%;
+      transition: transform .15s ease, filter .2s ease;
+    }
+    .balloon:hover{
+      transform: translateY(-6px) scale(1.03);
+      filter: drop-shadow(0 18px 32px rgba(0,0,0,.42));
+    }
+    .balloon:active{ transform: translateY(-3px) scale(.99); }
+
+    /* tiny sparkle ring */
+    .ring{
+      position:absolute;
+      width:180px; height:180px;
+      border-radius:50%;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,77,141,.18);
+      opacity:.0;
+      animation: ring 1.4s ease-out infinite;
+      pointer-events:none;
+    }
+    @keyframes ring{
+      0%{ opacity:0; transform: scale(.72) }
+      18%{ opacity:.55 }
+      100%{ opacity:0; transform: scale(1.28) }
+    }
+    @keyframes float{
+      0%,100%{ transform: translateY(0) rotate(-1deg) }
+      50%{ transform: translateY(-14px) rotate(1deg) }
+    }
+
+    /* Heart (decor) */
+    .heart{
+      width:54px;
+      height:54px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      animation: heartBeat 1.8s ease-in-out infinite;
+      transform-origin:center;
+    }
+    @keyframes heartBeat{
+      0%,100%{ transform: scale(1) }
+      12%{ transform: scale(1.06) }
+      24%{ transform: scale(1) }
+      36%{ transform: scale(1.04) }
+    }
+
+    .sparkle{
+      position:absolute;
+      inset:-200px;
+      background: radial-gradient(circle at 20% 30%, rgba(255,255,255,.16), transparent 30%),
+                  radial-gradient(circle at 70% 40%, rgba(255,255,255,.10), transparent 30%),
+                  radial-gradient(circle at 50% 80%, rgba(255,255,255,.12), transparent 30%);
+      animation: drift 10s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes drift{
+      0%{ transform: translate3d(0,0,0) }
+      100%{ transform: translate3d(0,-80px,0) }
+    }
+
+    .loveNote{
+      margin:0 0 14px 0;
+      padding:14px 14px 12px 14px;
+      border-radius:18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      position:relative;
+      overflow:hidden;
+    }
+    .loveNote::before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,77,141,.20), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(167,139,250,.18), transparent 45%);
+      filter: blur(14px);
+      opacity:.65;
+      pointer-events:none;
+    }
+    .loveNoteTop, .loveNoteBottom{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,77,141,.18);
+      border: 1px solid rgba(255,77,141,.30);
+      font-size:12px;
+      font-weight:700;
+    }
+    .dots{ opacity:.7; font-size:18px; }
+    .loveNoteText{
+      position:relative;
+      z-index:1;
+      padding:10px 2px 8px 2px;
+      font-size:14px;
+      line-height:1.35;
+      min-height:42px;
+      letter-spacing:.15px;
+    }
+    .caret{
+      display:inline-block;
+      width:8px;
+      margin-left:2px;
+      border-bottom:2px solid rgba(255,255,255,.85);
+      transform: translateY(-2px);
+      animation: caret 900ms steps(1) infinite;
+      opacity:.9;
+    }
+    @keyframes caret{ 50%{ opacity:0 } }
+    .sig{ opacity:.85; font-size:12px; }
+
+    .controls{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      padding:10px 14px;
+      border-radius:14px;
+      background: rgba(255,255,255,.10);
+      color:var(--white);
+      border: 1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease;
+      font-weight:600;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14) }
+    .btn:active{ transform: translateY(1px) }
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      z-index:50;
+    }
+    .modal.open{ display:grid; }
+
+    .modalCard{
+      width:min(920px, 95vw);
+      background: rgba(20, 25, 45, .92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:26px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.55);
+      overflow:hidden;
+      transform: translateY(10px) scale(.98);
+      opacity:0;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .modal.open .modalCard{ transform: translateY(0) scale(1); opacity:1; }
+
+    .modalHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modalHead .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,77,141,.20);
+      border: 1px solid rgba(255,77,141,.35);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .modalTitle{
+      font-weight:800;
+      letter-spacing:.2px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .modalBody{ padding:16px; }
+
+    .viewer{
+      width:100%;
+      height:min(60vh, 520px);
+      border-radius:22px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+    .viewer::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:24px;
+      background: conic-gradient(from 180deg, rgba(255,77,141,.0), rgba(255,77,141,.35), rgba(167,139,250,.30), rgba(255,77,141,.0));
+      filter: blur(14px);
+      opacity:.35;
+      animation: glowSpin2 5.5s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes glowSpin2{ to{ transform: rotate(360deg) } }
+
+    .viewer img{
+      width:auto !important;
+      height:auto !important;
+      max-width:100% !important;
+      max-height:100% !important;
+      object-fit:contain !important;
+      object-position:center !important;
+      display:block;
+      background: rgba(0,0,0,.12);
+      will-change: transform, opacity;
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .small{
+      opacity:.85;
+      font-size:13px;
+      margin:10px 0 0 0;
+      line-height:1.35;
+    }
+    .x{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+    }
+    .toast{
+      position:absolute;
+      top:14px;
+      right:14px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      opacity:0;
+      transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events:none;
+    }
+    .toast.show{ opacity:1; transform: translateY(0) }
+
+    .sr-only{ position:absolute; left:-9999px; }
+
+    /* floating background hearts */
+    .bgHearts{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .bgHearts span{
+      position:absolute;
+      opacity:.18;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+      animation: driftUp linear infinite;
+    }
+    @keyframes driftUp{
+      0%{ transform: translateY(110vh) translateX(0) rotate(0deg); opacity:0 }
+      10%{ opacity:.18 }
+      100%{ transform: translateY(-20vh) translateX(40px) rotate(18deg); opacity:0 }
+    }
+
+    /* slide animations */
+    .inRight{ animation: inRight .38s ease both; }
+    .inLeft{ animation: inLeft .38s ease both; }
+    @keyframes inRight{ from{ opacity:0; transform: translateX(26px) scale(.985) } to{ opacity:1; transform: translateX(0) scale(1) } }
+    @keyframes inLeft{ from{ opacity:0; transform: translateX(-26px) scale(.985) } to{ opacity:1; transform: translateX(0) scale(1) } }
+
+    /* confetti hearts burst */
+    .heartBurst{ position:absolute; inset:0; pointer-events:none; z-index:3; }
+    .heartBurst i{
+      position:absolute;
+      left:50%; top:45%;
+      transform: translate(-50%,-50%);
+      font-style:normal;
+      opacity:0;
+      animation: pop 900ms ease forwards;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+    @keyframes pop{
+      0%{ opacity:0; transform: translate(-50%,-50%) scale(.6) }
+      10%{ opacity:1 }
+      100%{ opacity:0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.2) rotate(var(--r)) }
+    }
+
+    /* ring + float */
+    .ring{
+      position:absolute;
+      width:180px; height:180px;
+      border-radius:50%;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,77,141,.18);
+      opacity:0;
+      animation: ring 1.4s ease-out infinite;
+      pointer-events:none;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="twinkles" aria-hidden="true" id="twinkles"></div>
+  <div class="bgHearts" aria-hidden="true" id="bgHearts"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="sparkle"></div>
+
+      <div class="title">
+        <!-- Heart icon -->
+        <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff4d8d" />
+              <stop offset="1" stop-color="#ff7ab6" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#g)" d="M12 21s-7.2-4.45-9.6-8.53C.8 9.7 2.2 6.6 5.3 5.7c1.9-.6 4 .1 5.3 1.7 1.3-1.6 3.4-2.3 5.3-1.7 3.1.9 4.5 4 2.9 6.77C19.2 16.55 12 21 12 21z"/>
+        </svg>
+        <h1>Click the balloon 💘</h1>
+      </div>
+
+      <p class="sub">
+        <span id="loveLine">A tiny surprise for <b>my favorite person</b> ✨</span>
+        <span style="opacity:.8">&nbsp;Click the balloon to start a sweet photo moment (with music).</span>
+      </p>
+
+      <div class="loveNote" aria-label="Love note">
+        <div class="loveNoteTop">
+          <span class="pill">💌 little note</span>
+          <span class="dots" aria-hidden="true">⋯</span>
+        </div>
+        <div class="loveNoteText" id="typewriter"></div>
+        <div class="loveNoteBottom">
+          <span class="sig">— from me to you 💖</span>
+        </div>
+      </div>
+
+      <div class="stage" aria-label="Balloon stage">
+        <div class="toast" id="toast">Loading your photos… 💞</div>
+        <div class="ring" aria-hidden="true"></div>
+
+        <!-- Balloon SVG -->
+        <svg class="balloon" id="balloon" viewBox="0 0 120 160" role="button" tabindex="0" aria-label="Open the love slideshow">
+          <defs>
+            <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff7ab6" />
+              <stop offset="1" stop-color="#ff2f7d" />
+            </linearGradient>
+          </defs>
+          <path d="M60 10c23 0 40 18 40 41 0 30-22 48-33 59-2 2-3 4-2 7l6 18H49l6-18c1-3 0-5-2-7C42 99 20 81 20 51 20 28 37 10 60 10z" fill="url(#b)"/>
+          <path d="M72 33c0 7-6 12-13 12" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M60 125c2 3 6 6 6 10 0 3-3 5-6 5s-6-2-6-5c0-4 4-7 6-10z" fill="#ffb3d1" opacity=".9"/>
+          <path d="M60 140c0 0 0 14-16 20" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <div class="hint">Click / tap the balloon</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="testSong">Test song</button>
+        <button class="btn" id="stopSong">Stop song</button>
+      </div>
+
+      <p class="small">
+        Song: upload an MP3 named <b>love-song.mp3</b> next to this HTML file (same folder).
+        Photos: upload images into a folder named <b>photos</b> and name them <b>1.jpg, 2.jpg, 3.jpg…</b> (or .png/.webp).
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal slideshow -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-label="Love slideshow">
+      <div class="modalHead">
+        <div class="left">
+          <span class="badge" id="counter">0 / 0</span>
+          <div class="modalTitle">Your photos</div>
+        </div>
+        <div class="x" id="close" aria-label="Close">✕</div>
+      </div>
+
+      <div class="modalBody">
+        <div class="viewer">
+          <div class="heartBurst" id="heartBurst" aria-hidden="true"></div>
+          <img id="img" alt="" />
+        </div>
+
+        <div class="nav">
+          <button class="btn" id="prev">◀ Prev</button>
+          <button class="btn" id="next">Next ▶</button>
+        </div>
+
+        <p class="small">Keyboard: ← / → to navigate, Esc to close.</p>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="auto" loop>
+    <source src="love-song.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const balloon = document.getElementById('balloon');
+    const modal = document.getElementById('modal');
+    const img = document.getElementById('img');
+    const counter = document.getElementById('counter');
+    const toast = document.getElementById('toast');
+
+    const audio = document.getElementById('audio');
+    const testSong = document.getElementById('testSong');
+    const stopSong = document.getElementById('stopSong');
+
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const closeBtn = document.getElementById('close');
+
+    const heartBurst = document.getElementById('heartBurst');
+    let lastDir = 1; // 1 = next/right, -1 = prev/left
+
+    // Preloaded photo URLs (from /photos folder)
+    // GitHub Pages can’t list folder contents, so we auto-try: photos/1..60 with common extensions.
+    let images = []; // array of URLs
+    let photosReady = false;
+    let idx = 0;
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
+    function setImage(){
+      if(!images.length){
+        img.removeAttribute('src');
+        counter.textContent = '0 / 0';
+        return;
+      }
+
+      idx = (idx + images.length) % images.length;
+      const nextSrc = images[idx];
+
+      img.onerror = () => {
+        images.splice(idx, 1);
+        if(!images.length){
+          img.removeAttribute('src');
+          counter.textContent = '0 / 0';
+          showToast('Could not display those images. Try JPG/PNG.');
+          return;
+        }
+        idx = idx % images.length;
+        showToast('Skipped a photo that wouldn’t load');
+        setImage();
+      };
+
+      img.style.width = 'auto';
+      img.style.height = 'auto';
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.style.objectFit = 'contain';
+      img.style.objectPosition = 'center';
+
+      img.classList.remove('inLeft','inRight');
+      void img.offsetWidth;
+      img.classList.add(lastDir === 1 ? 'inRight' : 'inLeft');
+
+      img.src = nextSrc;
+      counter.textContent = `${idx+1} / ${images.length}`;
+    }
+
+    function burstHearts(){
+      if(!heartBurst) return;
+      heartBurst.innerHTML = '';
+      const hearts = ['💖','💘','💝','💗','💕'];
+      for(let i=0;i<18;i++){
+        const el = document.createElement('i');
+        el.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+        el.style.setProperty('--x', (Math.random()*240 - 120).toFixed(0) + 'px');
+        el.style.setProperty('--y', (Math.random()*220 - 160).toFixed(0) + 'px');
+        el.style.setProperty('--r', (Math.random()*70 - 35).toFixed(0) + 'deg');
+        el.style.fontSize = (Math.random()*18 + 14).toFixed(0) + 'px';
+        el.style.animationDelay = (Math.random()*80).toFixed(0) + 'ms';
+        heartBurst.appendChild(el);
+      }
+    }
+
+    function closeModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    async function urlExists(url){
+      return new Promise((resolve) => {
+        const probe = new Image();
+        probe.onload = () => resolve(true);
+        probe.onerror = () => resolve(false);
+        probe.src = url + `?v=${Date.now()}`;
+      });
+    }
+
+    async function preloadPhotos(){
+      if(photosReady) return;
+      showToast('Loading photos… 💞');
+
+      const maxIndex = 60; // increase if you have more
+      const exts = ['jpg','jpeg','png','webp','gif'];
+      const found = [];
+      let missesInARow = 0;
+
+      for(let i=1;i<=maxIndex;i++){
+        let gotOne = false;
+
+        for(const ext of exts){
+          const url = `photos/${i}.${ext}`;
+          // eslint-disable-next-line no-await-in-loop
+          const ok = await urlExists(url);
+          if(ok){
+            found.push(url);
+            gotOne = true;
+            break;
+          }
+        }
+
+        if(!gotOne){
+          missesInARow++;
+        } else {
+          missesInARow = 0;
+        }
+
+        if(missesInARow >= 6 && found.length >= 3) break;
+      }
+
+      images = found;
+      photosReady = true;
+
+      if(!images.length){
+        showToast('No photos found in /photos (use 1.jpg, 2.jpg, 3.jpg…)');
+      } else {
+        idx = 0;
+        setImage();
+        showToast(`Loaded ${images.length} photo${images.length>1?'s':''} 💖`);
+      }
+    }
+
+    function openModal(){
+      if(!photosReady){
+        preloadPhotos().then(() => {
+          if(images.length) openModal();
+        });
+        return;
+      }
+      if(!images.length){
+        showToast('No photos found in /photos 💔');
+        return;
+      }
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      burstHearts();
+      setImage();
+
+      audio.play().catch(() => showToast('Song blocked — click “Test song”'));
+    }
+
+    // UI actions
+    balloon.addEventListener('click', openModal);
+    balloon.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' ') openModal();
+    });
+
+    prevBtn.addEventListener('click', () => { lastDir = -1; idx--; setImage(); burstHearts(); });
+    nextBtn.addEventListener('click', () => { lastDir = 1; idx++; setImage(); burstHearts(); });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+    testSong.addEventListener('click', () => {
+      audio.play().then(() => showToast('Playing 🎵')).catch(() => showToast('Could not play — check love-song.mp3'));
+    });
+
+    stopSong.addEventListener('click', () => {
+      audio.pause();
+      audio.currentTime = 0;
+      showToast('Stopped');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if(!modal.classList.contains('open')) return;
+      if(e.key === 'Escape') closeModal();
+      if(e.key === 'ArrowLeft') { lastDir = -1; idx--; setImage(); burstHearts(); }
+      if(e.key === 'ArrowRight') { lastDir = 1; idx++; setImage(); burstHearts(); }
+    });
+
+    // Floating hearts background
+    (function makeBgHearts(){
+      const host = document.getElementById('bgHearts');
+      if(!host) return;
+      const chars = ['💗','💖','💕','💘'];
+      for(let i=0;i<22;i++){
+        const s = document.createElement('span');
+        s.textContent = chars[Math.floor(Math.random()*chars.length)];
+        s.style.left = (Math.random()*100).toFixed(2) + 'vw';
+        const dur = 8 + Math.random()*10;
+        s.style.animationDuration = dur.toFixed(2) + 's';
+        s.style.animationDelay = (-Math.random()*dur).toFixed(2) + 's';
+        s.style.fontSize = (14 + Math.random()*18).toFixed(0) + 'px';
+        host.appendChild(s);
+      }
+    })();
+
+    // Twinkles
+    (function makeTwinkles(){
+      const host = document.getElementById('twinkles');
+      if(!host) return;
+      for(let i=0;i<34;i++){
+        const t = document.createElement('i');
+        t.style.left = (Math.random()*100).toFixed(2) + 'vw';
+        t.style.top = (Math.random()*100).toFixed(2) + 'vh';
+        t.style.animationDuration = (2.2 + Math.random()*2.6).toFixed(2) + 's';
+        t.style.animationDelay = (Math.random()*2.8).toFixed(2) + 's';
+        host.appendChild(t);
+      }
+    })();
+
+    // Typewriter love note
+    (function typewriter(){
+      const el = document.getElementById('typewriter');
+      if(!el) return;
+      const lines = [
+        'I made this just for you — because you make my days softer 💕',
+        'Every photo is a tiny “I love you” without saying it out loud 💖',
+        'If you’re smiling right now… mission accomplished 😄💘',
+        'Click the balloon and let’s replay our favorite moments ✨'
+      ];
+      let line = 0, i = 0, deleting = false;
+
+      function tick(){
+        const text = lines[line];
+        if(!deleting){
+          i++;
+          el.innerHTML = text.slice(0, i) + '<span class="caret"></span>';
+          if(i >= text.length){
+            deleting = true;
+            setTimeout(tick, 1400);
+            return;
+          }
+        } else {
+          i--;
+          el.innerHTML = text.slice(0, Math.max(0,i)) + '<span class="caret"></span>';
+          if(i <= 0){
+            deleting = false;
+            line = (line + 1) % lines.length;
+          }
+        }
+        setTimeout(tick, deleting ? 28 : 36);
+      }
+      tick();
+    })();
+
+    // Preload on page load
+    window.addEventListener('load', () => {
+      preloadPhotos();
+      setTimeout(() => showToast('Click the balloon 💞'), 700);
+    });
+  </script>
+</body>
+</html>
